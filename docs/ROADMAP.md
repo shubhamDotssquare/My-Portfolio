@@ -16,15 +16,18 @@ Milestones from the Design & Engineering Specification. Tick tasks as they land.
 
 Acceptance: boot, lock and home states work. ✅
 
-## M2 — Boot + Lock polish
-- [ ] Notification previews on lock screen
+## M2 — Boot + Lock polish (deferred)
+- [ ] Notification previews on lock screen (needs `src/data/notifications.ts`, lands with M7 Notification Center)
 - [ ] Lock-screen tuning on real devices
 
-## M3 — Home
-- [ ] OS-011 AppIcon
-- [ ] OS-012 AppGrid
-- [ ] OS-013 Dock
-- [ ] Press animation, greeting
+## M3 — Home ✅
+- [x] OS-011 AppIcon (tinted gradient, spring press, a11y label)
+- [x] OS-012 AppGrid (4×2, reads `src/data/apps.ts` registry)
+- [x] OS-013 Dock (Projects · Resume · Contact)
+- [x] Press animation, greeting
+- [x] Temporary app placeholder proves Home → App → Home (Escape / Back / home indicator); replaced by OS-014
+
+Acceptance: home feels like a polished mobile home screen. ✅
 
 ## M4 — App Engine
 - [ ] OS-014 AppWindow

@@ -22,6 +22,17 @@
   --os-warning: #ffb454;
   --os-danger: #ff4d72;
 
+  /* Application icon tints (AppIcon gradients read these via --tint) */
+  --os-tint-indigo: #5b7cff;
+  --os-tint-violet: #7c5cff;
+  --os-tint-cyan: #22b8cf;
+  --os-tint-emerald: #34c98a;
+  --os-tint-amber: #f5a524;
+  --os-tint-rose: #ff5c8a;
+  --os-tint-sky: #3aa0ff;
+  --os-tint-slate: #6b7a90;
+  --os-on-tint: #ffffff;
+
   /* Device chrome */
   --os-bezel: #0b0d12;
   --os-island: #000000;
@@ -62,6 +73,15 @@
   --color-os-danger: var(--os-danger);
   --color-os-bezel: var(--os-bezel);
   --color-os-island: var(--os-island);
+  --color-os-tint-indigo: var(--os-tint-indigo);
+  --color-os-tint-violet: var(--os-tint-violet);
+  --color-os-tint-cyan: var(--os-tint-cyan);
+  --color-os-tint-emerald: var(--os-tint-emerald);
+  --color-os-tint-amber: var(--os-tint-amber);
+  --color-os-tint-rose: var(--os-tint-rose);
+  --color-os-tint-sky: var(--os-tint-sky);
+  --color-os-tint-slate: var(--os-tint-slate);
+  --color-os-on-tint: var(--os-on-tint);
 
   --font-sans:
     var(--font-inter), ui-sans-serif, system-ui, -apple-system,
@@ -137,6 +157,22 @@ body {
 /* Padding that clears the home indicator + safe area at the bottom */
 @utility os-pb-safe {
   padding-bottom: calc(var(--os-safe-bottom) + var(--os-indicator-height));
+}
+
+/* Application icon surface: tinted gradient with soft depth. Set --tint on the element. */
+@utility os-app-icon {
+  --tint: var(--os-accent);
+  color: var(--os-on-tint);
+  background-image: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--tint) 78%, white) 0%,
+    var(--tint) 48%,
+    color-mix(in srgb, var(--tint) 74%, black) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 10px 22px -10px color-mix(in srgb, var(--tint) 70%, transparent);
 }
 
 @utility os-heading {
