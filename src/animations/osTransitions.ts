@@ -36,3 +36,10 @@ export const bootVariants: Variants = {
 export function variantsFor(reduced: boolean, spatial: Variants): Variants {
   return reduced ? screenFade : spatial;
 }
+
+/** App window without a source icon (deep link, keyboard, Back/Forward). */
+export const appWindowVariants: Variants = {
+  initial: { opacity: 0, scale: 0.94 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.96 },
+};

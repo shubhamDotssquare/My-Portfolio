@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { parsePath } from "@/lib/routes";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -31,9 +32,21 @@ export type OverlayMode = Extract<
 
 export type PerformanceMode = "high" | "balanced";
 
+/** Where an app was launched from — drives the icon → window morph. */
+export type LaunchSource = "grid" | "dock" | "none";
+
+export interface OpenAppOptions {
+  /** Nested route segments after the app path (e.g. a project slug). */
+  params?: string[];
+  source?: LaunchSource;
+}
+
 export interface OSState {
   mode: OSMode;
   currentApp: AppId | null;
+  /** Nested route segments for the current app ("/projects/rise-club" → ["rise-club"]). */
+  appParams: string[];
+  launchSource: LaunchSource;
   previousApp: AppId | null;
   recentApps: AppId[];
 
@@ -57,12 +70,17 @@ export interface OSActions {
   /** Any → Lock */
   lock: () => void;
 
-  /** Open an application (Home/App → App) */
-  openApp: (id: AppId) => void;
+  /** Open an application (Home/App → App). Re-opening the current app only updates params. */
+  openApp: (id: AppId, options?: OpenAppOptions) => void;
   /** Close current application (App → Home) */
   closeApp: () => void;
   /** Return to Home from anywhere unlocked, closing overlays. */
   goHome: () => void;
+  /**
+   * Make OS state reflect a URL (initial load, browser Back/Forward).
+   * During boot it only records the target so boot/unlock land in the app.
+   */
+  syncFromPath: (pathname: string) => void;
 
   /** System overlays */
   openOverlay: (overlay: OverlayMode) => void;
@@ -113,6 +131,10 @@ function isOverlay(mode: OSMode): mode is OverlayMode {
   );
 }
 
+function sameParams(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
 /** The mode beneath any overlay: "app" if an app is open, otherwise "home". */
 function baseMode(state: Pick<OSState, "currentApp">): Extract<OSMode, "home" | "app"> {
   return state.currentApp ? "app" : "home";
@@ -121,6 +143,8 @@ function baseMode(state: Pick<OSState, "currentApp">): Extract<OSMode, "home" | 
 export const initialOSState: OSState = {
   mode: "boot",
   currentApp: null,
+  appParams: [],
+  launchSource: "none",
   previousApp: null,
   recentApps: [],
 
@@ -144,13 +168,17 @@ export const useOSStore = create<OSStore>()((set, get) => ({
   ...initialOSState,
 
   completeBoot: () => {
-    if (get().mode !== "boot") return;
-    set({ mode: "lock", isLocked: true });
+    const { mode, currentApp } = get();
+    if (mode !== "boot") return;
+    // A deep link (e.g. /projects) opens straight into the app; "/" shows the lock screen.
+    if (currentApp) set({ mode: "app", isLocked: false });
+    else set({ mode: "lock", isLocked: true });
   },
 
   unlock: () => {
-    if (get().mode !== "lock") return;
-    set({ mode: "home", isLocked: false, ...CLOSED_OVERLAY_FLAGS });
+    const { mode, currentApp } = get();
+    if (mode !== "lock") return;
+    set({ mode: currentApp ? "app" : "home", isLocked: false, ...CLOSED_OVERLAY_FLAGS });
   },
 
   lock: () => {
@@ -159,35 +187,36 @@ export const useOSStore = create<OSStore>()((set, get) => ({
       mode: "lock",
       isLocked: true,
       currentApp: null,
+      appParams: [],
+      launchSource: "none",
       previousApp: null,
       ...CLOSED_OVERLAY_FLAGS,
     });
   },
 
-  openApp: (id) => {
-    const { mode, currentApp, recentApps } = get();
+  openApp: (id, options = {}) => {
+    const { mode, currentApp, appParams, recentApps } = get();
     if (mode === "boot" || mode === "lock") return;
-    if (currentApp === id && mode === "app") return;
+    const params = options.params ?? [];
+
+    // Same app: only navigate within it (keeps the window mounted).
+    if (currentApp === id && mode === "app") {
+      if (!sameParams(appParams, params)) set({ appParams: params });
+      return;
+    }
 
     set({
       mode: "app",
       currentApp: id,
+      appParams: params,
+      launchSource: options.source ?? "none",
       previousApp: currentApp,
       recentApps: [id, ...recentApps.filter((a) => a !== id)].slice(0, MAX_RECENT_APPS),
       ...CLOSED_OVERLAY_FLAGS,
     });
   },
 
-  closeApp: () => {
-    const { mode, currentApp } = get();
-    if (mode === "boot" || mode === "lock") return;
-    set({
-      mode: "home",
-      currentApp: null,
-      previousApp: currentApp,
-      ...CLOSED_OVERLAY_FLAGS,
-    });
-  },
+  closeApp: () => get().goHome(),
 
   goHome: () => {
     const { mode, currentApp } = get();
@@ -195,7 +224,47 @@ export const useOSStore = create<OSStore>()((set, get) => ({
     set({
       mode: "home",
       currentApp: null,
+      appParams: [],
+      launchSource: "none",
       previousApp: currentApp,
+      ...CLOSED_OVERLAY_FLAGS,
+    });
+  },
+
+  syncFromPath: (pathname) => {
+    const route = parsePath(pathname);
+    const { mode, currentApp, appParams, recentApps } = get();
+
+    // Booting or locked: record the destination; completeBoot/unlock will land there.
+    if (mode === "boot" || mode === "lock") {
+      set(
+        route
+          ? { currentApp: route.appId, appParams: route.params, launchSource: "none" }
+          : { currentApp: null, appParams: [] },
+      );
+      return;
+    }
+
+    if (!route) {
+      if (currentApp !== null || isOverlay(mode)) get().goHome();
+      return;
+    }
+
+    if (route.appId === currentApp && mode === "app") {
+      if (!sameParams(appParams, route.params)) set({ appParams: route.params });
+      return;
+    }
+
+    set({
+      mode: "app",
+      currentApp: route.appId,
+      appParams: route.params,
+      launchSource: "none",
+      previousApp: currentApp,
+      recentApps: [route.appId, ...recentApps.filter((a) => a !== route.appId)].slice(
+        0,
+        MAX_RECENT_APPS,
+      ),
       ...CLOSED_OVERLAY_FLAGS,
     });
   },
@@ -233,3 +302,4 @@ export const useOSStore = create<OSStore>()((set, get) => ({
 export const selectMode = (s: OSStore) => s.mode;
 export const selectIsUnlocked = (s: OSStore) => s.mode !== "boot" && s.mode !== "lock";
 export const selectCurrentApp = (s: OSStore) => s.currentApp;
+export const selectAppParams = (s: OSStore) => s.appParams;

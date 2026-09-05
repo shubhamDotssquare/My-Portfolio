@@ -29,12 +29,14 @@ Acceptance: boot, lock and home states work. ✅
 
 Acceptance: home feels like a polished mobile home screen. ✅
 
-## M4 — App Engine
-- [ ] OS-014 AppWindow
-- [ ] App registry
-- [ ] OS-015 Open transition
-- [ ] OS-016 Close transition
-- [ ] OS-017 Browser history synchronization
+## M4 — App Engine ✅
+- [x] OS-014 AppWindow (shared chrome: Back, title, actions slot, safe-area scroll area)
+- [x] App registry (`src/data/apps.ts` catalogue + `src/apps/registry.tsx` lazy content map)
+- [x] OS-015 Open transition (icon → window shared-layout morph; fade fallback for deep links / reduced motion)
+- [x] OS-016 Close transition (window → launching icon; Back button, Escape, home indicator)
+- [x] OS-017 Browser history synchronization (`[[...segments]]` route, native pushState, popstate → store, deep links open the app directly, per-app metadata, 404 for unknown paths)
+
+Acceptance: every app uses the same engine. ✅
 
 ## M5 — Portfolio Apps
 - [ ] OS-018 About

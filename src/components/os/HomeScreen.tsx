@@ -6,17 +6,18 @@ import { pickTransition } from "@/animations/spring";
 import { useOSReducedMotion } from "@/hooks/useReducedMotion";
 import { OWNER } from "@/lib/constants";
 import { getGreeting } from "@/lib/utils";
-import { useOSStore } from "@/store/osStore";
+import { useOSStore, type AppId, type LaunchSource } from "@/store/osStore";
 import { AppGrid } from "./AppGrid";
 import { Dock } from "./Dock";
 
 /**
  * Home screen: greeting, application grid and dock. Tapping an icon
- * dispatches `openApp` to the OS store — the app engine (M4) renders it.
+ * dispatches `openApp` to the OS store; AppHost renders the window.
  */
 export function HomeScreen() {
   const openApp = useOSStore((s) => s.openApp);
   const reduced = useOSReducedMotion();
+  const handleOpen = (id: AppId, source: LaunchSource) => openApp(id, { source });
 
   return (
     <motion.main
@@ -38,7 +39,7 @@ export function HomeScreen() {
           <p className="mt-3 text-[15px] text-os-text-secondary">Welcome to {OWNER.osName}.</p>
         </header>
 
-        <AppGrid onOpen={openApp} className="mt-9" />
+        <AppGrid onOpen={handleOpen} className="mt-9" />
 
         <div className="flex-1" />
 
@@ -47,7 +48,7 @@ export function HomeScreen() {
           <span className="h-1.5 w-1.5 rounded-full bg-os-text-primary/80" />
         </div>
 
-        <Dock onOpen={openApp} className="mb-1" />
+        <Dock onOpen={handleOpen} className="mb-1" />
       </div>
     </motion.main>
   );

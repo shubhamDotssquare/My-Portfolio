@@ -2,11 +2,11 @@
 
 import { dockApps } from "@/data/apps";
 import { cn } from "@/lib/utils";
-import type { AppId } from "@/store/osStore";
+import type { AppId, LaunchSource } from "@/store/osStore";
 import { AppIcon } from "./AppIcon";
 
 interface DockProps {
-  onOpen: (id: AppId) => void;
+  onOpen: (id: AppId, source: LaunchSource) => void;
   className?: string;
 }
 
@@ -21,7 +21,14 @@ export function Dock({ onOpen, className }: DockProps) {
       )}
     >
       {dockApps.map((app) => (
-        <AppIcon key={app.id} app={app} onOpen={onOpen} showLabel={false} className="w-auto" />
+        <AppIcon
+          key={app.id}
+          app={app}
+          source="dock"
+          onOpen={onOpen}
+          showLabel={false}
+          className="w-auto"
+        />
       ))}
     </nav>
   );

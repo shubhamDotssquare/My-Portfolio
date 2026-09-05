@@ -22,3 +22,6 @@ export const OWNER = {
   title: "Mobile Developer",
   osName: "SHUBHAM OS",
 } as const;
+
+/** App icon corner radius in px — mirrors `--radius-os-icon`; Motion needs a number to morph it. */
+export const ICON_RADIUS_PX = 18;
