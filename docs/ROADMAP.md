@@ -52,11 +52,15 @@ Acceptance: every app uses the same engine. ✅
 
 Acceptance: all portfolio information is accessible through OS apps. ✅ (with placeholder content)
 
-## M6 — Developer Lab
-- [ ] OS-022 Lab shell
-- [ ] OS-023 Physics
-- [ ] OS-024 Gesture
-- [ ] OS-025 Animation
+## M6 — Developer Lab ✅
+- [x] OS-022 Lab shell (`/lab`, experiments at `/lab/[id]` — `src/data/lab.ts`)
+- [x] OS-023 Physics Playground (stiffness/damping/mass sliders, drag + release velocity, damping-ratio readout, arrow-key nudge)
+- [x] OS-024 Gesture Lab (swipe, dismissible stack, long press, bottom sheet snap points, pull to refresh — each with a button/keyboard alternative)
+- [x] OS-025 Animation Lab (spring, timing, fade, scale, slide, layout, shared element — live component + transition code)
+- [x] UI Component Lab (switch, segmented control, stepper, toast)
+- [x] Shared controls: `Slider`, `Segmented`, `CodeBlock`
+
+Acceptance: at least three experiments are genuinely interactive. ✅ (four)
 
 ## M7 — System Features
 - [ ] OS-030 Control Center

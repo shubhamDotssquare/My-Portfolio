@@ -1,6 +1,7 @@
 import { apps, getApp } from "@/data/apps";
 import { archNodes, getArchNode } from "@/data/architecture";
 import { caseStudies, getCaseStudy } from "@/data/caseStudies";
+import { experiments, getExperiment } from "@/data/lab";
 import { getProject, projects } from "@/data/projects";
 import { type OSRoute, parsePath } from "./routes";
 
@@ -25,6 +26,8 @@ export function isValidRoute(route: OSRoute): boolean {
       return params.length === 0 || (params.length === 1 && Boolean(getCaseStudy(params[0])));
     case "architecture":
       return params.length === 0 || (params.length === 1 && Boolean(getArchNode(params[0])));
+    case "developer-lab":
+      return params.length === 0 || (params.length === 1 && Boolean(getExperiment(params[0])));
     default:
       return params.length === 0;
   }
@@ -47,6 +50,7 @@ export function allStaticSegments(): string[][] {
     ...projects.filter((p) => p.demo).map((p) => [...seg(getApp("projects").path), p.id, "demo"]),
     ...caseStudies.map((c) => [...seg(getApp("case-studies").path), c.id]),
     ...archNodes.map((n) => [...seg(getApp("architecture").path), n.id]),
+    ...experiments.map((e) => [...seg(getApp("developer-lab").path), e.id]),
   ];
 }
 
@@ -65,6 +69,8 @@ export function routeTitle(route: OSRoute): string {
       return getCaseStudy(first)?.title ?? app.name;
     case "architecture":
       return getArchNode(first)?.label ?? app.name;
+    case "developer-lab":
+      return getExperiment(first)?.title ?? app.name;
     default:
       return app.name;
   }
