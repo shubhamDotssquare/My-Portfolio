@@ -30,7 +30,7 @@ export function PhoneFrame({ children, className }: PhoneFrameProps) {
       {/* Bezel (desktop only) */}
       <div
         className={cn(
-          "relative",
+          "relative w-full md:w-auto",
           "md:rounded-os-bezel md:bg-os-bezel md:p-2.5",
           "md:shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.06)]",
         )}
@@ -60,7 +60,7 @@ export function PhoneFrame({ children, className }: PhoneFrameProps) {
             // Mobile: full viewport
             "h-dvh w-full",
             // Desktop: reference aspect, scaled to viewport height
-            "md:aspect-[390/844] md:h-[min(844px,calc(100dvh-4.5rem))] md:w-auto",
+            "md:aspect-[390/844] md:h-[min(844px,calc(100dvh-7.5rem))] md:w-auto",
             "md:max-w-[calc(100vw-3rem)] md:rounded-os-screen",
             "md:[--os-safe-top:0px] md:[--os-safe-bottom:0px]",
             "[--os-safe-top:env(safe-area-inset-top,0px)] [--os-safe-bottom:env(safe-area-inset-bottom,0px)]",
