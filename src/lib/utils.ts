@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
 
 /** Merge Tailwind class names, resolving conflicts. */
@@ -64,3 +65,8 @@ export const session = {
     }
   },
 };
+
+/** Inline style that points `--tint` at an `--os-tint-*` token (see os-app-icon). */
+export function tintVar(tint: string): CSSProperties {
+  return { "--tint": `var(--os-tint-${tint})` } as CSSProperties;
+}

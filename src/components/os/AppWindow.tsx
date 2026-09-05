@@ -2,7 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { appWindowVariants, screenFade } from "@/animations/osTransitions";
 import { pickTransition, springs } from "@/animations/spring";
 import type { AppDefinition } from "@/data/apps";
@@ -41,7 +41,13 @@ export function AppWindow({
 }: AppWindowProps) {
   const reduced = useOSReducedMotion();
   const layoutId = reduced ? undefined : appLayoutId(app.id, launchSource);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const nested = params.length > 0;
+
+  // New nested location → start at the top of the content.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [params]);
   const backLabel = nested ? app.name : "Home";
 
   return (
@@ -79,7 +85,9 @@ export function AppWindow({
           <div className="flex min-w-[4.5rem] items-center justify-end gap-1 pr-2">{actions}</div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 os-pb-safe [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div
+          ref={scrollRef}
+          className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 os-pb-safe [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {children}
         </div>
       </motion.div>

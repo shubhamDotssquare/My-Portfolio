@@ -12,7 +12,7 @@ export interface AppContentProps {
 
 function AppLoading() {
   return (
-    <div role="status" aria-live="polite" className="flex flex-1 items-center justify-center">
+    <div role="status" aria-live="polite" className="flex flex-1 items-center justify-center pt-24">
       <span className="h-1.5 w-10 animate-pulse rounded-full bg-os-border-strong" />
       <span className="sr-only">Loading</span>
     </div>
@@ -23,16 +23,14 @@ function AppLoading() {
 const lazy = (loader: () => Promise<ComponentType<AppContentProps>>) =>
   dynamic(loader, { loading: AppLoading });
 
-const Placeholder = lazy(() => import("./PlaceholderApp").then((m) => m.PlaceholderApp));
-
-/** AppId → content component. M5 replaces each entry with the real app. */
+/** AppId → content component. */
 export const appComponents: Record<AppId, ComponentType<AppContentProps>> = {
-  about: Placeholder,
-  projects: Placeholder,
-  "case-studies": Placeholder,
-  "developer-lab": Placeholder,
-  experience: Placeholder,
-  architecture: Placeholder,
-  contact: Placeholder,
-  resume: Placeholder,
+  about: lazy(() => import("./about/AboutApp").then((m) => m.AboutApp)),
+  projects: lazy(() => import("./projects/ProjectsApp").then((m) => m.ProjectsApp)),
+  "case-studies": lazy(() => import("./case-studies/CaseStudiesApp").then((m) => m.CaseStudiesApp)),
+  "developer-lab": lazy(() => import("./developer-lab/DeveloperLabApp").then((m) => m.DeveloperLabApp)),
+  experience: lazy(() => import("./experience/ExperienceApp").then((m) => m.ExperienceApp)),
+  architecture: lazy(() => import("./architecture/ArchitectureApp").then((m) => m.ArchitectureApp)),
+  contact: lazy(() => import("./contact/ContactApp").then((m) => m.ContactApp)),
+  resume: lazy(() => import("./resume/ResumeApp").then((m) => m.ResumeApp)),
 };

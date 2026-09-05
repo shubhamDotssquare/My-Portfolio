@@ -38,15 +38,19 @@ Acceptance: home feels like a polished mobile home screen. ✅
 
 Acceptance: every app uses the same engine. ✅
 
-## M5 — Portfolio Apps
-- [ ] OS-018 About
-- [ ] OS-019 Projects
-- [ ] OS-020 Project Detail
-- [ ] OS-021 Case Studies
-- [ ] OS-026 Experience
-- [ ] OS-027 Architecture
-- [ ] OS-028 Contact
-- [ ] OS-029 Resume
+## M5 — Portfolio Apps ✅
+- [x] OS-018 About (`src/data/profile.ts`)
+- [x] OS-019 Projects (search, featured rail, list — `src/data/projects.ts`)
+- [x] OS-020 Project Detail (`/projects/[slug]`) + interactive experience (`/projects/[slug]/demo`, data-driven screens)
+- [x] OS-021 Case Studies (`/case-studies/[slug]`, 8-step flow with jump rail — `src/data/caseStudies.ts`)
+- [x] OS-026 Experience (timeline + education — `src/data/experience.ts`)
+- [x] OS-027 Architecture (clickable diagram, node selected via `/architecture/[node]` — `src/data/architecture.ts`; stack from `src/data/skills.ts`)
+- [x] OS-028 Contact (native-validated form → `POST /api/contact`, optional `CONTACT_WEBHOOK_URL`, honeypot; no RHF/Zod dependency added)
+- [x] OS-029 Resume (sections link to apps; PDF buttons disabled until `profile.resume.pdfUrl` is set)
+- [x] Shared UI primitives in `src/components/ui/`; nested slugs validated server-side (404) and in-app
+- [ ] Replace all `[Placeholder]` content, sample metrics and links with real, owner-supplied data
+
+Acceptance: all portfolio information is accessible through OS apps. ✅ (with placeholder content)
 
 ## M6 — Developer Lab
 - [ ] OS-022 Lab shell
