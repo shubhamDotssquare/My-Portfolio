@@ -7,8 +7,10 @@ import { lockScreenVariants, variantsFor } from "@/animations/osTransitions";
 import { pickTransition } from "@/animations/spring";
 import { useClock } from "@/hooks/useClock";
 import { useOSReducedMotion } from "@/hooks/useReducedMotion";
+import { notifications } from "@/data/notifications";
 import { OWNER, UNLOCK_DISTANCE_PX, UNLOCK_VELOCITY } from "@/lib/constants";
 import { useOSStore } from "@/store/osStore";
+import { TintIcon } from "@/components/ui/TintIcon";
 
 /**
  * Lock screen: live clock/date, ambient background, swipe-up to unlock.
@@ -17,7 +19,10 @@ import { useOSStore } from "@/store/osStore";
  */
 export function LockScreen() {
   const unlock = useOSStore((s) => s.unlock);
+  const unlockTo = useOSStore((s) => s.unlockTo);
+  const dismissed = useOSStore((s) => s.dismissedNotifications);
   const reduced = useOSReducedMotion();
+  const previews = notifications.filter((n) => !dismissed.includes(n.id)).slice(0, 2);
   const { time, weekday, monthDay, ready } = useClock();
   const hintRef = useRef<HTMLButtonElement>(null);
 
@@ -85,6 +90,32 @@ export function LockScreen() {
             )}
           </p>
         </div>
+
+        {/* Notification previews — tapping unlocks straight into the related app */}
+        {previews.length > 0 && (
+          <ul aria-label="Notifications" className="mt-9 flex w-full flex-col gap-2 px-5">
+            {previews.map((n) => (
+              <li key={n.id}>
+                <button
+                  type="button"
+                  onClick={() => unlockTo(n.appId, n.params)}
+                  aria-label={`${n.category}: ${n.title}. Unlock and open.`}
+                  className="flex w-full items-center gap-3 rounded-[1.25rem] os-glass px-3.5 py-3 text-left outline-none transition-colors hover:bg-os-surface-elevated focus-visible:ring-2 focus-visible:ring-os-accent"
+                >
+                  <TintIcon icon={n.icon} tint={n.tint} />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="truncate text-[11px] font-semibold tracking-[0.1em] text-os-text-tertiary uppercase">{n.category}</span>
+                      <span className="text-[11px] text-os-text-tertiary">{n.when}</span>
+                    </span>
+                    <span className="block truncate text-[14px] font-semibold text-os-text-primary">{n.title}</span>
+                    <span className="block truncate text-[12px] text-os-text-secondary">{n.body}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="flex-1" />
 

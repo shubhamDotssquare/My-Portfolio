@@ -60,6 +60,10 @@ export interface OSState {
   soundEnabled: boolean;
   performanceMode: PerformanceMode;
   batteryLevel: number;
+  /** 0.3 – 1; rendered as a dimming layer over the screen. */
+  brightness: number;
+  /** Notification ids the visitor has swiped away this session. */
+  dismissedNotifications: string[];
 }
 
 export interface OSActions {
@@ -96,6 +100,17 @@ export interface OSActions {
   toggleSound: () => void;
   setPerformanceMode: (mode: PerformanceMode) => void;
   setBatteryLevel: (level: number) => void;
+  setBrightness: (value: number) => void;
+
+  /** Notifications */
+  dismissNotification: (id: string) => void;
+  clearNotifications: (ids: string[]) => void;
+
+  /** App Switcher */
+  removeRecentApp: (id: AppId) => void;
+
+  /** Lock → App directly (tapping a lock-screen notification). */
+  unlockTo: (id: AppId, params?: string[]) => void;
 }
 
 export type OSStore = OSState & OSActions;
@@ -122,7 +137,7 @@ const CLOSED_OVERLAY_FLAGS = {
   isSpotlightOpen: false,
 } as const;
 
-function isOverlay(mode: OSMode): mode is OverlayMode {
+export function isOverlay(mode: OSMode): mode is OverlayMode {
   return (
     mode === "control-center" ||
     mode === "notifications" ||
@@ -158,6 +173,8 @@ export const initialOSState: OSState = {
   soundEnabled: false,
   performanceMode: "high",
   batteryLevel: 100,
+  brightness: 1,
+  dismissedNotifications: [],
 };
 
 /* ------------------------------------------------------------------ */
@@ -296,6 +313,35 @@ export const useOSStore = create<OSStore>()((set, get) => ({
   setPerformanceMode: (performanceMode) => set({ performanceMode }),
   setBatteryLevel: (level) =>
     set({ batteryLevel: Math.min(100, Math.max(0, Math.round(level))) }),
+  setBrightness: (value) => set({ brightness: Math.min(1, Math.max(0.3, value)) }),
+
+  dismissNotification: (id) =>
+    set((s) => ({
+      dismissedNotifications: s.dismissedNotifications.includes(id)
+        ? s.dismissedNotifications
+        : [...s.dismissedNotifications, id],
+    })),
+  clearNotifications: (ids) =>
+    set((s) => ({
+      dismissedNotifications: Array.from(new Set([...s.dismissedNotifications, ...ids])),
+    })),
+
+  removeRecentApp: (id) => set((s) => ({ recentApps: s.recentApps.filter((a) => a !== id) })),
+
+  unlockTo: (id, params = []) => {
+    const { mode, recentApps } = get();
+    if (mode !== "lock") return;
+    set({
+      mode: "app",
+      isLocked: false,
+      currentApp: id,
+      appParams: params,
+      launchSource: "none",
+      previousApp: null,
+      recentApps: [id, ...recentApps.filter((a) => a !== id)].slice(0, MAX_RECENT_APPS),
+      ...CLOSED_OVERLAY_FLAGS,
+    });
+  },
 }));
 
 /* Convenience selectors (stable references for React re-render control) */
@@ -303,3 +349,13 @@ export const selectMode = (s: OSStore) => s.mode;
 export const selectIsUnlocked = (s: OSStore) => s.mode !== "boot" && s.mode !== "lock";
 export const selectCurrentApp = (s: OSStore) => s.currentApp;
 export const selectAppParams = (s: OSStore) => s.appParams;
+
+/* Development aid: inspect the OS from the browser console / test drivers. */
+declare global {
+  interface Window {
+    __SHUBHAM_OS__?: typeof useOSStore;
+  }
+}
+if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
+  window.__SHUBHAM_OS__ = useOSStore;
+}

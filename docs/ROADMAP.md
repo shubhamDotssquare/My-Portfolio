@@ -16,9 +16,9 @@ Milestones from the Design & Engineering Specification. Tick tasks as they land.
 
 Acceptance: boot, lock and home states work. ✅
 
-## M2 — Boot + Lock polish (deferred)
-- [ ] Notification previews on lock screen (needs `src/data/notifications.ts`, lands with M7 Notification Center)
-- [ ] Lock-screen tuning on real devices
+## M2 — Boot + Lock polish
+- [x] Notification previews on lock screen (tap → unlock straight into the related app)
+- [ ] Lock-screen tuning on real devices (M8)
 
 ## M3 — Home ✅
 - [x] OS-011 AppIcon (tinted gradient, spring press, a11y label)
@@ -62,12 +62,15 @@ Acceptance: all portfolio information is accessible through OS apps. ✅ (with p
 
 Acceptance: at least three experiments are genuinely interactive. ✅ (four)
 
-## M7 — System Features
-- [ ] OS-030 Control Center
-- [ ] OS-031 Notification Center
-- [ ] OS-032 Spotlight
-- [ ] OS-033 App Switcher
-- [ ] OS-034 Keyboard shortcuts
+## M7 — System Features ✅
+- [x] OS-030 Control Center (Motion, Dark/Light, Performance high/balanced → blur off, Sound with synthesised ticks, Brightness scrim, Recents, Lock; swipe-down on status icons or tap)
+- [x] OS-031 Notification Center (`src/data/notifications.ts`; swipe/✕ dismiss, Clear all, tap → app; swipe-down on the clock or tap)
+- [x] OS-032 Spotlight (index over apps, projects, case studies, lab, experience, skills, architecture; ⌘/Ctrl+K, Home search pill, swipe-down on Home; ↑↓ ↵ esc)
+- [x] OS-033 App Switcher (recent apps as cards; swipe-up/✕ removes; S key, Control Center → Recents, or swipe-up-and-hold on the home indicator)
+- [x] OS-034 Keyboard shortcuts (⌘K, Esc, H, P, A, L, E, C, R, S, N; desktop hint under the frame)
+- [x] Overlays keep the open app mounted beneath them; all overlays are code-split
+
+Acceptance: the experience feels like one coherent system. ✅
 
 ## M8 — Polish
 - [ ] OS-035 Reduced-motion audit

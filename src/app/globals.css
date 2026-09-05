@@ -42,6 +42,10 @@
   --os-safe-bottom: 0px;
   --os-status-height: 3.375rem; /* 54px */
   --os-indicator-height: 2.125rem; /* 34px */
+
+  /* Glass blur radii (zeroed in balanced performance mode) */
+  --os-blur-md: 24px;
+  --os-blur-lg: 32px;
 }
 
 :root[data-theme="light"] {
@@ -55,6 +59,20 @@
   --os-text-tertiary: #7d869a;
   --os-border: rgba(0, 0, 0, 0.08);
   --os-border-strong: rgba(0, 0, 0, 0.16);
+}
+
+/* Balanced performance mode: drop backdrop blur (the most expensive effect)
+   and make surfaces more opaque so legibility is unchanged. */
+:root[data-performance="balanced"] {
+  --os-blur-md: 0px;
+  --os-blur-lg: 0px;
+  --os-surface: rgba(20, 24, 32, 0.94);
+  --os-surface-elevated: rgba(30, 35, 46, 0.98);
+}
+
+:root[data-theme="light"][data-performance="balanced"] {
+  --os-surface: rgba(255, 255, 255, 0.94);
+  --os-surface-elevated: rgba(255, 255, 255, 0.99);
 }
 
 @theme inline {
@@ -118,15 +136,15 @@ body {
 @utility os-glass {
   background: var(--os-surface);
   border: 1px solid var(--os-border);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(var(--os-blur-md)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--os-blur-md)) saturate(140%);
 }
 
 @utility os-glass-elevated {
   background: var(--os-surface-elevated);
   border: 1px solid var(--os-border-strong);
-  backdrop-filter: blur(32px) saturate(160%);
-  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  backdrop-filter: blur(var(--os-blur-lg)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--os-blur-lg)) saturate(160%);
 }
 
 @utility os-wallpaper {

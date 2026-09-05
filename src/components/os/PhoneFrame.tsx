@@ -71,12 +71,32 @@ export function PhoneFrame({ children, className }: PhoneFrameProps) {
         </div>
       </div>
 
-      {/* Subtle stage caption (desktop only) */}
-      <p className="hidden select-none text-xs font-medium tracking-[0.18em] text-os-text-tertiary uppercase md:block">
-        {OWNER.osName}
-        <span className="mx-2 text-os-border-strong">·</span>
-        {OWNER.title} Portfolio
-      </p>
+      {/* Subtle stage caption + keyboard hints (desktop only) */}
+      <div className="hidden select-none flex-col items-center gap-2 md:flex">
+        <p className="text-xs font-medium tracking-[0.18em] text-os-text-tertiary uppercase">
+          {OWNER.osName}
+          <span className="mx-2 text-os-border-strong">·</span>
+          {OWNER.title} Portfolio
+        </p>
+        <p className="flex items-center gap-3 text-[11px] text-os-text-tertiary">
+          <Hint keys="⌘K" label="Spotlight" />
+          <Hint keys="H" label="Home" />
+          <Hint keys="P" label="Projects" />
+          <Hint keys="S" label="Recents" />
+          <Hint keys="Esc" label="Back" />
+        </p>
+      </div>
     </div>
+  );
+}
+
+function Hint({ keys, label }: { keys: string; label: string }) {
+  return (
+    <span className="flex items-center gap-1">
+      <kbd className="rounded-md border border-os-border bg-os-surface px-1.5 py-0.5 font-sans text-[10px] text-os-text-secondary">
+        {keys}
+      </kbd>
+      {label}
+    </span>
   );
 }
