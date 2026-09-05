@@ -1,26 +1,157 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ */
+/* SHUBHAM OS — semantic design tokens                                 */
+/* Components must reference these tokens, never raw hex values.       */
+/* ------------------------------------------------------------------ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --os-background: #05070b;
+  --os-surface: rgba(20, 24, 32, 0.72);
+  --os-surface-elevated: rgba(30, 35, 46, 0.82);
+  --os-text-primary: #f7f8fa;
+  --os-text-secondary: #a7afbd;
+  --os-text-tertiary: #6f7888;
+  --os-border: rgba(255, 255, 255, 0.1);
+  --os-border-strong: rgba(255, 255, 255, 0.18);
+  --os-accent: #5b7cff;
+  --os-accent-secondary: #7c5cff;
+  --os-success: #56d88a;
+  --os-warning: #ffb454;
+  --os-danger: #ff4d72;
+
+  /* Device chrome */
+  --os-bezel: #0b0d12;
+  --os-island: #000000;
+
+  /* Layout metrics (overridden per device mode in PhoneFrame) */
+  --os-safe-top: 0px;
+  --os-safe-bottom: 0px;
+  --os-status-height: 3.375rem; /* 54px */
+  --os-indicator-height: 2.125rem; /* 34px */
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --os-background: #eef0f5;
+  --os-surface: rgba(255, 255, 255, 0.72);
+  --os-surface-elevated: rgba(255, 255, 255, 0.9);
+  --os-text-primary: #0b0d12;
+  --os-text-secondary: #4b5464;
+  --os-text-tertiary: #7d869a;
+  --os-border: rgba(0, 0, 0, 0.08);
+  --os-border-strong: rgba(0, 0, 0, 0.16);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-os-background: var(--os-background);
+  --color-os-surface: var(--os-surface);
+  --color-os-surface-elevated: var(--os-surface-elevated);
+  --color-os-text-primary: var(--os-text-primary);
+  --color-os-text-secondary: var(--os-text-secondary);
+  --color-os-text-tertiary: var(--os-text-tertiary);
+  --color-os-border: var(--os-border);
+  --color-os-border-strong: var(--os-border-strong);
+  --color-os-accent: var(--os-accent);
+  --color-os-accent-secondary: var(--os-accent-secondary);
+  --color-os-success: var(--os-success);
+  --color-os-warning: var(--os-warning);
+  --color-os-danger: var(--os-danger);
+  --color-os-bezel: var(--os-bezel);
+  --color-os-island: var(--os-island);
+
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "SF Pro Display", sans-serif;
+
+  --radius-os-icon: 1.125rem; /* 18px */
+  --radius-os-screen: 2.75rem;
+  --radius-os-bezel: 3.25rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--os-background);
+  color: var(--os-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* OS utilities                                                        */
+/* ------------------------------------------------------------------ */
+
+@utility os-glass {
+  background: var(--os-surface);
+  border: 1px solid var(--os-border);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+}
+
+@utility os-glass-elevated {
+  background: var(--os-surface-elevated);
+  border: 1px solid var(--os-border-strong);
+  backdrop-filter: blur(32px) saturate(160%);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+}
+
+@utility os-wallpaper {
+  background-color: var(--os-background);
+  background-image:
+    radial-gradient(
+      60% 45% at 20% 10%,
+      color-mix(in srgb, var(--os-accent) 28%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 40% at 85% 25%,
+      color-mix(in srgb, var(--os-accent-secondary) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      70% 50% at 50% 100%,
+      color-mix(in srgb, var(--os-accent) 12%, transparent),
+      transparent 70%
+    );
+}
+
+/* Padding that clears the status bar + safe area at the top of a screen */
+@utility os-pt-safe {
+  padding-top: calc(var(--os-safe-top) + var(--os-status-height));
+}
+
+/* Padding that clears the home indicator + safe area at the bottom */
+@utility os-pb-safe {
+  padding-bottom: calc(var(--os-safe-bottom) + var(--os-indicator-height));
+}
+
+@utility os-heading {
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+/* Reduced-motion: keep the OS usable, drop decorative motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
