@@ -78,13 +78,6 @@ export function PhoneFrame({ children, className }: PhoneFrameProps) {
           <span className="mx-2 text-os-border-strong">·</span>
           {OWNER.title} Portfolio
         </p>
-        <p className="flex items-center gap-3 text-[11px] text-os-text-tertiary">
-          <Hint keys="⌘K" label="Spotlight" />
-          <Hint keys="H" label="Home" />
-          <Hint keys="P" label="Projects" />
-          <Hint keys="S" label="Recents" />
-          <Hint keys="Esc" label="Back" />
-        </p>
       </div>
     </div>
   );
