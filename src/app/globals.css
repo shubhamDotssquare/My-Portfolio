@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Desktop shows the phone frame only when there is room for it; short or
+   narrow viewports (phones, landscape phones, tiny windows) ARE the OS. */
+@custom-variant desktop (@media (min-width: 768px) and (min-height: 560px));
+/* Compact vertical layouts (small phones, landscape). */
+@custom-variant short (@media (max-height: 640px));
+
 /* ------------------------------------------------------------------ */
 /* SHUBHAM OS — semantic design tokens                                 */
 /* Components must reference these tokens, never raw hex values.       */
@@ -13,10 +19,11 @@
   --os-surface-elevated: rgba(30, 35, 46, 0.82);
   --os-text-primary: #f7f8fa;
   --os-text-secondary: #a7afbd;
-  --os-text-tertiary: #6f7888;
+  --os-text-tertiary: #8b95a5; /* ≥4.5:1 on every surface token */
   --os-border: rgba(255, 255, 255, 0.1);
   --os-border-strong: rgba(255, 255, 255, 0.18);
   --os-accent: #5b7cff;
+  --os-accent-fill: #4c6af0; /* filled surfaces carrying white text (≥4.5:1) */
   --os-accent-secondary: #7c5cff;
   --os-success: #56d88a;
   --os-warning: #ffb454;
@@ -56,7 +63,7 @@
   --os-surface-elevated: rgba(255, 255, 255, 0.9);
   --os-text-primary: #0b0d12;
   --os-text-secondary: #4b5464;
-  --os-text-tertiary: #7d869a;
+  --os-text-tertiary: #5f6a80;
   --os-border: rgba(0, 0, 0, 0.08);
   --os-border-strong: rgba(0, 0, 0, 0.16);
 }
@@ -85,6 +92,7 @@
   --color-os-border: var(--os-border);
   --color-os-border-strong: var(--os-border-strong);
   --color-os-accent: var(--os-accent);
+  --color-os-accent-fill: var(--os-accent-fill);
   --color-os-accent-secondary: var(--os-accent-secondary);
   --color-os-success: var(--os-success);
   --color-os-warning: var(--os-warning);
@@ -199,7 +207,8 @@ body {
   font-weight: 600;
 }
 
-/* Reduced-motion: keep the OS usable, drop decorative motion */
+/* Reduced-motion: keep the OS usable, drop decorative motion.
+   Applies for the system preference and for the Control Center toggle. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -209,4 +218,18 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* The device screen is an isolated compositing/layout root. */
+.os-device {
+  contain: layout paint;
 }

@@ -72,13 +72,16 @@ Acceptance: at least three experiments are genuinely interactive. ✅ (four)
 
 Acceptance: the experience feels like one coherent system. ✅
 
-## M8 — Polish
-- [ ] OS-035 Reduced-motion audit
-- [ ] OS-036 Responsive behaviour
-- [ ] OS-037 Asset optimization
-- [ ] OS-041 Performance audit
-- [ ] OS-042 Accessibility audit
-- [ ] OS-043 Visual polish
+## M8 — Polish ✅
+- [x] OS-035 Reduced-motion audit — every infinite/decorative animation is gated by `useOSReducedMotion()`; the Control Center toggle now also sets `data-motion="reduced"` on `<html>` so CSS animations/transitions stop like the system preference
+- [x] OS-036 Responsive behaviour — `desktop` variant requires width ≥768 **and** height ≥560; the phone frame renders at 390×844 and is transform-scaled to fit (no reflow); `short` variant (≤640px tall) compacts Lock/Home and lets Home scroll; content columns are capped at 520–560px so landscape phones don't stretch; verified 320×568, 375×667, 430×932, 844×390, 768×1024, 1280×640, 1440×900
+- [x] OS-037 Asset optimization — no raster assets yet (artwork is CSS gradients), Inter self-hosted via `next/font` (latin subset), Lucide icons tree-shaken; add real images via `next/image` when the owner supplies them
+- [x] OS-041 Performance audit — production build: initial JS ≈ 200–217 KB gzip, dominated by framework (React DOM ~70, Motion + shell ~58, Next runtime ~45); apps/overlays/lab experiments are separate lazy chunks (Lab list 5 KB, experiments ~4–8 KB each); `contain: layout paint` on the device; `will-change: transform` on lock blobs
+- [x] OS-042 Accessibility audit — axe-core (WCAG 2.1 AA + best-practice) clean on lock, home, app, all four overlays, lab, contact, architecture; contrast-safe tertiary text and `--os-accent-fill` for white-on-accent; focus scope hook (trap + restore) in overlays; app windows take focus on open and return it to the launching icon; Home/app are `inert` beneath higher layers; live-region announcer; single banner landmark
+- [x] OS-043 Visual polish — light theme verified across lock/home/detail/overlays; styled `not-found.tsx` and `error.tsx`; in-window `AppErrorBoundary` keeps the OS alive if an app crashes
+- [ ] Lock-screen / gesture tuning on real devices — needs a physical phone (owner to verify thresholds in `src/lib/constants.ts`)
+
+Acceptance: audits pass; the OS feels calm and consistent across viewports. ✅
 
 ## M9 — Launch
 - [ ] OS-038 PWA

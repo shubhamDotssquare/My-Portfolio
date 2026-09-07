@@ -10,6 +10,7 @@ import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { SESSION_BOOTED_KEY } from "@/lib/constants";
 import { session } from "@/lib/utils";
 import { isOverlay, selectIsUnlocked, selectMode, useOSStore } from "@/store/osStore";
+import { Announcer } from "./Announcer";
 import { AppHost } from "./AppHost";
 import { BootScreen } from "./BootScreen";
 import { DynamicIsland } from "./DynamicIsland";
@@ -61,9 +62,13 @@ export function OS() {
   useEffect(() => {
     document.documentElement.dataset.performance = performanceMode;
   }, [performanceMode]);
+  useEffect(() => {
+    document.documentElement.dataset.motion = reduced ? "reduced" : "full";
+  }, [reduced]);
 
   // An app stays mounted beneath any overlay.
-  const appOpen = currentApp !== null && (mode === "app" || isOverlay(mode));
+  const overlayOpen = isOverlay(mode);
+  const appOpen = currentApp !== null && (mode === "app" || overlayOpen);
 
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "user"}>
@@ -79,12 +84,12 @@ export function OS() {
 
         {/* Home lives beneath the lock screen so unlock reveals it. */}
         <AnimatePresence initial={false}>
-          {isUnlocked && <HomeScreen key="home" />}
+          {isUnlocked && <HomeScreen key="home" inert={appOpen || overlayOpen} />}
         </AnimatePresence>
 
         {/* App layer: keyed by app so switching apps remounts the window. */}
         <AnimatePresence initial={false}>
-          {appOpen && <AppHost key={currentApp} id={currentApp} />}
+          {appOpen && <AppHost key={currentApp} id={currentApp} inert={overlayOpen} />}
         </AnimatePresence>
 
         {/* System overlays */}
@@ -107,6 +112,8 @@ export function OS() {
             onHold={isUnlocked ? () => openOverlay("app-switcher") : undefined}
           />
         )}
+
+        <Announcer />
 
         {/* Brightness scrim (Control Center slider) */}
         {brightness < 1 && (

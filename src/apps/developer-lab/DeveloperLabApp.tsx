@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import { experiments, getExperiment } from "@/data/lab";
 import { useOSStore } from "@/store/osStore";
 import { InAppNotFound } from "@/components/ui/InAppNotFound";
@@ -9,10 +10,18 @@ import { Reveal } from "@/components/ui/Reveal";
 import { TintIcon } from "@/components/ui/TintIcon";
 import type { AppContentProps } from "../registry";
 import { ExperimentFrame } from "./ExperimentFrame";
-import { AnimationLab } from "./experiments/AnimationLab";
-import { ComponentLab } from "./experiments/ComponentLab";
-import { GestureLab } from "./experiments/GestureLab";
-import { PhysicsPlayground } from "./experiments/PhysicsPlayground";
+
+/* Each experiment is its own chunk; the Lab list loads without any of them. */
+const loading = () => (
+  <div role="status" aria-live="polite" className="flex h-64 items-center justify-center rounded-[1.5rem] os-glass">
+    <span className="h-1.5 w-10 animate-pulse rounded-full bg-os-border-strong" />
+    <span className="sr-only">Loading experiment</span>
+  </div>
+);
+const PhysicsPlayground = dynamic(() => import("./experiments/PhysicsPlayground").then((m) => m.PhysicsPlayground), { loading });
+const GestureLab = dynamic(() => import("./experiments/GestureLab").then((m) => m.GestureLab), { loading });
+const AnimationLab = dynamic(() => import("./experiments/AnimationLab").then((m) => m.AnimationLab), { loading });
+const ComponentLab = dynamic(() => import("./experiments/ComponentLab").then((m) => m.ComponentLab), { loading });
 
 /**
  * /lab              → experiment list

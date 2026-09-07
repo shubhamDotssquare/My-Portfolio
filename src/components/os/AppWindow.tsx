@@ -3,6 +3,7 @@
 import { ChevronLeft } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, type ReactNode } from "react";
+import { useFocusScope } from "@/hooks/useFocusScope";
 import { appWindowVariants, screenFade } from "@/animations/osTransitions";
 import { pickTransition, springs } from "@/animations/spring";
 import type { AppDefinition } from "@/data/apps";
@@ -18,6 +19,8 @@ interface AppWindowProps {
   onBack: () => void;
   /** Optional right-side header controls. */
   actions?: ReactNode;
+  /** True while a system overlay covers the window. */
+  inert?: boolean;
   children: ReactNode;
 }
 
@@ -37,9 +40,14 @@ export function AppWindow({
   launchSource,
   onBack,
   actions,
+  inert = false,
   children,
 }: AppWindowProps) {
   const reduced = useOSReducedMotion();
+  const windowRef = useRef<HTMLElement>(null);
+  // Focus moves to the window on open (screen readers announce its name) and
+  // returns to the launching icon on close. Not a trap: Home is inert meanwhile.
+  useFocusScope(windowRef, { trap: false });
   const layoutId = reduced ? undefined : appLayoutId(app.id, launchSource);
   const scrollRef = useRef<HTMLDivElement>(null);
   const nested = params.length > 0;
@@ -52,6 +60,10 @@ export function AppWindow({
 
   return (
     <motion.section
+      ref={windowRef}
+      tabIndex={-1}
+      inert={inert}
+      aria-hidden={inert || undefined}
       aria-label={app.name}
       layoutId={layoutId}
       variants={layoutId ? undefined : reduced ? screenFade : appWindowVariants}
@@ -60,11 +72,11 @@ export function AppWindow({
       exit="exit"
       transition={layoutId ? { layout: springs.smooth } : pickTransition(reduced, "smooth")}
       style={{ borderRadius: layoutId ? 0 : undefined }}
-      className="absolute inset-0 z-20 flex flex-col overflow-hidden bg-os-background"
+      className="absolute inset-0 z-20 flex flex-col overflow-hidden bg-os-background outline-none"
     >
       {/* Content fades in slightly after the surface morph so text never scales. */}
       <motion.div
-        className="flex min-h-0 flex-1 flex-col"
+        className="mx-auto flex min-h-0 w-full max-w-[560px] flex-1 flex-col"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.2, delay: layoutId ? 0.12 : 0 } }}
         exit={{ opacity: 0, transition: { duration: 0.1 } }}

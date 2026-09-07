@@ -2,7 +2,8 @@
 
 import { BellOff, X } from "lucide-react";
 import { AnimatePresence, motion, type PanInfo, type Variants } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useFocusScope } from "@/hooks/useFocusScope";
 import { screenFade } from "@/animations/osTransitions";
 import { pickTransition, springs } from "@/animations/spring";
 import { notifications, type OSNotification } from "@/data/notifications";
@@ -28,6 +29,8 @@ export function NotificationCenter() {
   const clearNotifications = useOSStore((s) => s.clearNotifications);
   const { weekday, monthDay, ready } = useClock();
   const [dir, setDir] = useState(1);
+  const sheetRef = useRef<HTMLElement>(null);
+  useFocusScope(sheetRef);
 
   const visible = notifications.filter((n) => !dismissed.includes(n.id));
 
@@ -44,6 +47,8 @@ export function NotificationCenter() {
     <>
       <OverlayBackdrop onClose={closeOverlay} label="Close Notification Center" />
       <motion.section
+        ref={sheetRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="Notification Center"
@@ -59,7 +64,7 @@ export function NotificationCenter() {
         transition={pickTransition(reduced, "smooth")}
         className="absolute inset-x-0 top-0 z-[35] flex max-h-[82%] flex-col rounded-b-[2rem] os-glass-elevated px-4 pb-3 os-pt-safe shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] touch-none"
       >
-        <header className="flex items-end justify-between px-1 pt-1 pb-3">
+        <div className="mx-auto flex w-full max-w-[560px] items-end justify-between px-1 pt-1 pb-3">
           <div>
             <h2 className="os-heading text-[1.5rem] leading-none text-os-text-primary">Notifications</h2>
             <p className="mt-1 text-[13px] text-os-text-secondary" suppressHydrationWarning>
@@ -74,9 +79,9 @@ export function NotificationCenter() {
           >
             Clear all
           </button>
-        </header>
+        </div>
 
-        <ul className="flex min-h-0 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Notifications">
+        <ul className="mx-auto flex w-full max-w-[560px] min-h-0 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Notifications">
           <AnimatePresence custom={dir} initial={false}>
             {visible.map((n) => (
               <NotificationCard key={n.id} n={n} dir={dir} onOpen={() => openApp(n.appId, { params: n.params })} onDismiss={(d) => dismiss(n.id, d)} />

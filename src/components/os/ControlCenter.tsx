@@ -2,7 +2,8 @@
 
 import { Gauge, LayoutGrid, Lock, Moon, Sun, Volume2, VolumeX, Wind, type LucideIcon } from "lucide-react";
 import { motion, type PanInfo, type Variants } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useFocusScope } from "@/hooks/useFocusScope";
 import { screenFade } from "@/animations/osTransitions";
 import { pickTransition } from "@/animations/spring";
 import { useOSReducedMotion } from "@/hooks/useReducedMotion";
@@ -36,11 +37,8 @@ export function ControlCenter() {
   const toggleSound = useOSStore((s) => s.toggleSound);
   const brightness = useOSStore((s) => s.brightness);
   const setBrightness = useOSStore((s) => s.setBrightness);
-  const firstTile = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    firstTile.current?.focus({ preventScroll: true });
-  }, []);
+  const panelRef = useRef<HTMLElement>(null);
+  useFocusScope(panelRef);
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y < -50 || info.velocity.y < -500) closeOverlay();
@@ -50,6 +48,8 @@ export function ControlCenter() {
     <>
       <OverlayBackdrop onClose={closeOverlay} label="Close Control Center" />
       <motion.section
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="Control Center"
@@ -68,7 +68,7 @@ export function ControlCenter() {
       >
         <div className="grid grid-cols-2 gap-2.5">
           <Tile
-            ref={firstTile}
+            autoFocus
             icon={Wind}
             label="Motion"
             value={motionEnabled ? "On" : "Reduced"}
@@ -126,26 +126,26 @@ interface TileProps {
   value: string;
   active: boolean;
   onClick: () => void;
-  ref?: React.Ref<HTMLButtonElement>;
+  autoFocus?: boolean;
 }
 
-function Tile({ icon: Icon, label, value, active, onClick, ref }: TileProps) {
+function Tile({ icon: Icon, label, value, active, onClick, autoFocus }: TileProps) {
   return (
     <button
-      ref={ref}
+      data-autofocus={autoFocus ? "" : undefined}
       type="button"
       onClick={onClick}
       aria-pressed={active}
       aria-label={`${label}: ${value}`}
       className={cn(
         "flex flex-col items-start gap-3 rounded-[1.25rem] p-3.5 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-os-accent",
-        active ? "bg-os-accent text-os-on-tint" : "bg-os-surface text-os-text-primary",
+        active ? "bg-os-accent-fill text-os-on-tint" : "bg-os-surface text-os-text-primary",
       )}
     >
       <Icon className="h-5 w-5" strokeWidth={2.2} aria-hidden />
       <span className="flex flex-col">
         <span className="text-[13px] font-semibold leading-tight">{label}</span>
-        <span className={cn("text-[12px]", active ? "opacity-80" : "text-os-text-tertiary")}>{value}</span>
+        <span className={cn("text-[12px]", active ? "font-medium" : "text-os-text-tertiary")}>{value}</span>
       </span>
     </button>
   );

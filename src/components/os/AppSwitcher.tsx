@@ -2,6 +2,8 @@
 
 import { LayoutGrid, X } from "lucide-react";
 import { AnimatePresence, motion, type PanInfo, type Variants } from "motion/react";
+import { useRef } from "react";
+import { useFocusScope } from "@/hooks/useFocusScope";
 import { screenFade } from "@/animations/osTransitions";
 import { pickTransition, springs } from "@/animations/spring";
 import { getApp } from "@/data/apps";
@@ -26,11 +28,15 @@ export function AppSwitcher() {
   const removeRecentApp = useOSStore((s) => s.removeRecentApp);
   const goHome = useOSStore((s) => s.goHome);
   const closeOverlay = useOSStore((s) => s.closeOverlay);
+  const stageRef = useRef<HTMLElement>(null);
+  useFocusScope(stageRef);
 
   return (
     <>
       <OverlayBackdrop onClose={closeOverlay} label="Close App Switcher" />
       <motion.section
+        ref={stageRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="App Switcher"
@@ -41,10 +47,10 @@ export function AppSwitcher() {
         transition={pickTransition(reduced, "smooth")}
         className="absolute inset-0 z-[35] flex flex-col os-pt-safe os-pb-safe"
       >
-        <header className="flex items-center justify-between px-6 pt-4">
+        <div className="flex items-center justify-between px-6 pt-4">
           <h2 className="os-heading text-[1.35rem] text-os-text-primary">Recent</h2>
           <span className="text-[12px] text-os-text-tertiary">Swipe up a card to remove it</span>
-        </header>
+        </div>
 
         <div className="flex min-h-0 flex-1 items-center">
           {recentApps.length === 0 ? (

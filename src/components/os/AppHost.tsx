@@ -4,13 +4,14 @@ import { useState } from "react";
 import { appComponents } from "@/apps/registry";
 import { getApp } from "@/data/apps";
 import { selectAppParams, useOSStore, type AppId } from "@/store/osStore";
+import { AppErrorBoundary } from "./AppErrorBoundary";
 import { AppWindow } from "./AppWindow";
 
 /**
  * Mounts the current app inside an AppWindow. Keyed by app id in OS.tsx so
  * switching apps remounts, while nested navigation (params) keeps the window.
  */
-export function AppHost({ id }: { id: AppId }) {
+export function AppHost({ id, inert = false }: { id: AppId; inert?: boolean }) {
   const params = useOSStore(selectAppParams);
   const openApp = useOSStore((s) => s.openApp);
   const closeApp = useOSStore((s) => s.closeApp);
@@ -27,8 +28,10 @@ export function AppHost({ id }: { id: AppId }) {
   };
 
   return (
-    <AppWindow app={app} params={params} launchSource={launchSource} onBack={handleBack}>
-      <Content appId={id} params={params} />
+    <AppWindow app={app} params={params} launchSource={launchSource} onBack={handleBack} inert={inert}>
+      <AppErrorBoundary appName={app.name} resetKey={`${id}/${params.join("/")}`}>
+        <Content appId={id} params={params} />
+      </AppErrorBoundary>
     </AppWindow>
   );
 }

@@ -2,7 +2,8 @@
 
 import { CornerDownLeft, Search, X } from "lucide-react";
 import { motion, type Variants } from "motion/react";
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useFocusScope } from "@/hooks/useFocusScope";
 import { screenFade } from "@/animations/osTransitions";
 import { pickTransition } from "@/animations/spring";
 import { useOSReducedMotion } from "@/hooks/useReducedMotion";
@@ -26,8 +27,9 @@ export function Spotlight() {
   const index = useMemo(() => buildSearchIndex(), []);
   const [query, setQuery] = useState("");
   const [selectedRaw, setSelected] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const listId = useId();
+  useFocusScope(panelRef);
 
   const results = useMemo(
     () => (query.trim() ? searchIndex(index, query) : searchSuggestions(index)),
@@ -37,9 +39,6 @@ export function Spotlight() {
   // Keep the highlight in range as results shrink (no effect needed).
   const selected = Math.min(selectedRaw, Math.max(0, results.length - 1));
 
-  useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true });
-  }, []);
 
   const open = (r: SearchResult) => openApp(r.appId, { params: r.params });
 
@@ -63,6 +62,8 @@ export function Spotlight() {
     <>
       <OverlayBackdrop onClose={closeOverlay} label="Close Spotlight" />
       <motion.section
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="Spotlight search"
@@ -71,12 +72,12 @@ export function Spotlight() {
         animate="animate"
         exit="exit"
         transition={pickTransition(reduced, "smooth")}
-        className="absolute inset-x-4 top-[calc(var(--os-safe-top)+var(--os-status-height)+0.5rem)] z-[35] flex max-h-[72%] flex-col gap-2"
+        className="absolute top-[calc(var(--os-safe-top)+var(--os-status-height)+0.5rem)] left-1/2 z-[35] flex max-h-[72%] w-[calc(100%-2rem)] max-w-[520px] -translate-x-1/2 flex-col gap-2"
       >
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-4 h-[18px] w-[18px] -translate-y-1/2 text-os-text-tertiary" aria-hidden />
           <input
-            ref={inputRef}
+            data-autofocus=""
             type="search"
             role="combobox"
             aria-expanded
@@ -129,13 +130,13 @@ export function Spotlight() {
                 onClick={() => open(r)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left outline-none",
-                  i === selected ? "bg-os-accent text-os-on-tint" : "text-os-text-primary",
+                  i === selected ? "bg-os-accent-fill text-os-on-tint" : "text-os-text-primary",
                 )}
               >
                 <TintIcon icon={r.icon} tint={r.tint} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px] font-medium">{r.title}</span>
-                  <span className={cn("block truncate text-[12px]", i === selected ? "opacity-80" : "text-os-text-secondary")}>
+                  <span className={cn("block truncate text-[12px]", i === selected ? "" : "text-os-text-secondary")}>
                     {r.subtitle}
                   </span>
                 </span>
@@ -145,7 +146,7 @@ export function Spotlight() {
           ))}
         </ul>
 
-        <p aria-hidden className="hidden px-2 text-center text-[11px] text-os-text-tertiary md:block">
+        <p aria-hidden className="hidden px-2 text-center text-[11px] text-os-text-tertiary desktop:block">
           ↑↓ navigate · ↵ open · esc close
         </p>
       </motion.section>

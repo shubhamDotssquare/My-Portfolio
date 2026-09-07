@@ -14,8 +14,13 @@ export const SESSION_BOOTED_KEY = "shubham-os:booted";
 export const UNLOCK_DISTANCE_PX = 110;
 export const UNLOCK_VELOCITY = 600;
 
-/** Breakpoint above which the desktop phone frame is shown (matches Tailwind `md`). */
+/** Viewport needed for the desktop phone frame (matches the `desktop` CSS variant). */
 export const DESKTOP_MIN_WIDTH = 768;
+export const DESKTOP_MIN_HEIGHT = 560;
+/** Below this height the `short` CSS variant applies (compact Lock/Home). */
+export const SHORT_VIEWPORT_PX = 640;
+/** Bezel box around the 390×844 screen (10px padding each side). */
+export const FRAME_BOX = { width: 410, height: 864 } as const;
 
 export const OWNER = {
   name: "Shubham",

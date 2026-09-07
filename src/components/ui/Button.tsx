@@ -13,7 +13,7 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-[15px] font-semibold outline-none select-none focus-visible:ring-2 focus-visible:ring-os-accent focus-visible:ring-offset-2 focus-visible:ring-offset-os-background disabled:cursor-not-allowed disabled:opacity-45";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-os-accent text-os-on-tint",
+  primary: "bg-os-accent-fill text-os-on-tint",
   secondary: "os-glass text-os-text-primary",
   /** Uses the surrounding `--tint` variable (see tintVar). */
   tint: "bg-[var(--tint)] text-os-on-tint",

@@ -8,6 +8,7 @@ import { pickTransition } from "@/animations/spring";
 import { useClock } from "@/hooks/useClock";
 import { useOSReducedMotion } from "@/hooks/useReducedMotion";
 import { notifications } from "@/data/notifications";
+import { cn } from "@/lib/utils";
 import { OWNER, UNLOCK_DISTANCE_PX, UNLOCK_VELOCITY } from "@/lib/constants";
 import { useOSStore } from "@/store/osStore";
 import { TintIcon } from "@/components/ui/TintIcon";
@@ -54,7 +55,7 @@ export function LockScreen() {
 
       {/* Draggable content layer */}
       <motion.div
-        className="relative flex flex-1 flex-col items-center os-pt-safe os-pb-safe"
+        className="relative mx-auto flex w-full max-w-[520px] flex-1 flex-col items-center os-pt-safe os-pb-safe"
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0.55, bottom: 0 }}
@@ -63,16 +64,16 @@ export function LockScreen() {
         style={{ y, opacity: contentOpacity, scale: contentScale }}
       >
         {/* Clock */}
-        <div className="mt-10 flex flex-col items-center text-os-text-primary">
+        <div className="mt-10 flex flex-col items-center text-os-text-primary short:mt-3">
           <time
-            className="os-heading text-[5.25rem] leading-none tracking-[-0.045em] tabular-nums"
+            className="os-heading text-[5.25rem] leading-none tracking-[-0.045em] tabular-nums short:text-[3rem]"
             dateTime={ready ? time : undefined}
             suppressHydrationWarning
           >
             {ready ? time : " "}
           </time>
           <p
-            className="mt-3 text-center text-[17px] font-medium leading-tight text-os-text-secondary"
+            className="mt-3 text-center text-[17px] font-medium leading-tight text-os-text-secondary short:mt-1.5 short:text-[14px]"
             suppressHydrationWarning
           >
             {ready ? (
@@ -93,9 +94,9 @@ export function LockScreen() {
 
         {/* Notification previews — tapping unlocks straight into the related app */}
         {previews.length > 0 && (
-          <ul aria-label="Notifications" className="mt-9 flex w-full flex-col gap-2 px-5">
-            {previews.map((n) => (
-              <li key={n.id}>
+          <ul aria-label="Notifications" className="mt-9 flex w-full flex-col gap-2 px-5 short:mt-4">
+            {previews.map((n, i) => (
+              <li key={n.id} className={cn(i > 0 && "short:hidden")}>
                 <button
                   type="button"
                   onClick={() => unlockTo(n.appId, n.params)}
@@ -120,7 +121,7 @@ export function LockScreen() {
         <div className="flex-1" />
 
         {/* Identity */}
-        <div className="mb-10 flex flex-col items-center gap-1 text-center">
+        <div className="mb-10 flex flex-col items-center gap-1 text-center short:mb-2 short:gap-0">
           <p className="os-heading text-[15px] tracking-[0.24em] text-os-text-primary">
             {OWNER.osName}
           </p>
@@ -132,7 +133,7 @@ export function LockScreen() {
           ref={hintRef}
           type="button"
           onClick={unlock}
-          className="group mb-3 flex flex-col items-center gap-1 rounded-2xl px-6 py-2 text-os-text-secondary outline-none transition-colors hover:text-os-text-primary focus-visible:ring-2 focus-visible:ring-os-accent"
+          className="group mb-3 flex flex-col items-center gap-1 rounded-2xl px-6 py-2 short:mb-1 short:py-1 text-os-text-secondary outline-none transition-colors hover:text-os-text-primary focus-visible:ring-2 focus-visible:ring-os-accent"
           aria-label="Unlock and open Home Screen"
         >
           <motion.span
@@ -175,7 +176,7 @@ function AmbientBackground({ reduced }: { reduced: boolean }) {
       {blobs.map((b, i) => (
         <motion.div
           key={i}
-          className={`absolute rounded-full blur-3xl ${b.className}`}
+          className={`absolute rounded-full blur-3xl will-change-transform ${b.className}`}
           animate={reduced ? undefined : b.animate}
           transition={{ duration: b.duration, repeat: Infinity, ease: "easeInOut" }}
         />
